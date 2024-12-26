@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import axios from 'axios'
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from '../context/AuthContext';
+
 
 function Signup() {    
 
@@ -9,11 +11,13 @@ function Signup() {
     const [email, setEmail] = useState()
     const [password, setPassword] = useState()
     const navigate = useNavigate()
+    const { login } = useContext(AuthContext);
 
     const handleSubmit = (e) => {
         e.preventDefault()
         axios.post("http://localhost:3001/register", { name, email, password })
         .then(result => {console.log(result)
+            login();
         navigate("/home")
         })
         .catch(err => console.log(err))

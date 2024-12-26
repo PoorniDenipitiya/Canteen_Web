@@ -1,20 +1,22 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import axios from 'axios'
-import { useNavigate } from "react-router-dom";
+import React, { useState, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from 'axios';
+import { AuthContext } from '../context/AuthContext';
 
 function Login() {    
 
-    const [email, setEmail] = useState()
-    const [password, setPassword] = useState()
-    const navigate = useNavigate()
+    const [email, setEmail] = useState();
+    const [password, setPassword] = useState();
+    const navigate = useNavigate();
+    const { login } = useContext(AuthContext);
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        axios.post("http://localhost:3000/login", { email, password })
+        axios.post("http://localhost:3001/login", { email, password })
         .then(result => {
             console.log(result)
             if(result.data === "Success"){
+                login();
                 navigate("/home")
             }else{
                 navigate("/register")
@@ -58,12 +60,12 @@ function Login() {
 
                     />
                 </div>
-                <button type="submit" className="btn btn-success w-100 rounded-0">
+                <button type="submit" className="btn btn-success w-100 rounded-1">
                     Login
                 </button>
                 </form>
                 <p>Don't have an account?</p>
-                <Link to="/register" className="btn btn-default border w-100 bg-light rounded-0 text-decoration-none">
+                <Link to="/register" className="btn btn-default border w-100 bg-light rounded-1 text-decoration-none">
                     Sign Up
                 </Link>
             
