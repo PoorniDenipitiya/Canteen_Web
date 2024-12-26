@@ -8,7 +8,7 @@ const Header = () => {
     const { isLoggedIn, logout } = useContext(AuthContext);
 
     return (
-        <header className="header">
+        <header className="header fixed-header">
             <div className="header__left">
                 <h1>CanTeenz</h1>
             </div>
