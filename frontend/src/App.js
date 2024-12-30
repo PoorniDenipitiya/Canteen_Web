@@ -9,6 +9,7 @@ import Header from './Components/Header';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import Footer from './Components/Footer';
 import Canteen from './Canteen/Canteen';
+import './App.css';
 
 function App() {
 
@@ -22,7 +23,7 @@ function App() {
          
           <Route path='/register' element={<Signup/>}/>
           <Route path='/login' element={<Login/>}/>
-          <Route path='/home' element={<Home />}/>
+          <Route path='/' element={<Home />}/>
           <Route path="/canteen" element={Canteen} />
         </Routes>
         </div>

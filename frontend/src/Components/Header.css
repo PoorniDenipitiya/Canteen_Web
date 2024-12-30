@@ -16,6 +16,8 @@
 
 .header__left h1 {
     margin: 0;
+    font-family: 'Brush Script MT', cursive;
+    font-size: 3em;
 }
 
 .header__nav {

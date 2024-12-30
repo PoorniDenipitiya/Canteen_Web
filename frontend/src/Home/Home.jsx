@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import { Carousel } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Home.css';
@@ -12,14 +12,46 @@ import pizza from '../Assets/pizza.jpeg';
 import crape from '../Assets/crape.jpeg';
 import pizza1 from '../Assets/pizza1.jpeg';
 import sandwitch from '../Assets/sandwitch.jpeg';
+import HomeCanteenMenu from './HomeCanteenMenu';
 
 function Home() {
+    const [selectedCanteen, setSelectedCanteen] = useState(null);
+
+    const handleCanteenClick = (canteen) => {
+        setSelectedCanteen(canteen);
+    };
+
+    const renderMenu = () => {
+        if (!selectedCanteen) {
+            return <p>Please select a canteen to see today's menu.</p>;
+        }
+
+        // Replace this with actual menu data for each canteen
+        const menu = {
+            "Canteen 1": ["Item 1", "Item 2", "Item 3"],
+            "Canteen 2": ["Item A", "Item B", "Item C"],
+            "Canteen 3": ["Item X", "Item Y", "Item Z"],
+            "Canteen 4": ["Item M", "Item N", "Item O"]
+        };
+
+        return (
+            <div>
+                <h2>{selectedCanteen} - Today's Menu</h2>
+                <ul>
+                    {menu[selectedCanteen].map((item, index) => (
+                        <li key={index}>{item}</li>
+                    ))}
+                </ul>
+            </div>
+        );
+    };
+
     return (
         <div>
           { /* <center>
                 <h1>This is Home Component</h1>
             </center>*/}
-            <Carousel interval={1500}>
+            <Carousel interval={3000}>
                 <Carousel.Item>
                     <img
                         className="d-block w-100 custom-carousel-img"
@@ -126,24 +158,24 @@ function Home() {
                 <h1 style={{ marginTop: '50px', marginBottom: '30px' }}>Top Canteens</h1>
             </center>
             <div className="box-container">
-                <Link to="/canteen?name=Canteen 1" className="box">
+                <div className="box" onClick={() => handleCanteenClick("Canteen 1")}>
                     <div className="box-text">Canteen 1</div>
                     <img src={bakery1} alt="Canteen 1" className="box-img" />
-                </Link>
-                <Link to="/canteen?name=Canteen 2" className="box">
+                </div>
+                <div className="box" onClick={() => handleCanteenClick("Canteen 2")}>
                     <div className="box-text">Canteen 2</div>
                     <img src={bakery2} alt="Canteen 2" className="box-img" />
-                </Link>
-                <Link to="/canteen?name=Canteen 3" className="box">
+                </div>
+                <div className="box" onClick={() => handleCanteenClick("Canteen 3")}>
                     <div className="box-text">Canteen 3</div>
                     <img src={beverages} alt="Canteen 3" className="box-img" />
-                </Link>
-                <Link to="/canteen?name=Canteen 4" className="box">
+                </div>
+                <div className="box" onClick={() => handleCanteenClick("Canteen 4")}>
                     <div className="box-text">Canteen 4</div>
                     <img src={burger} alt="Canteen 4" className="box-img" />
-                </Link>
+                </div>
             </div>
-            <div></div>
+            <HomeCanteenMenu selectedCanteen={selectedCanteen} />
         </div>
     );
 }
