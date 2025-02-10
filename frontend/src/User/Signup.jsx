@@ -1,27 +1,65 @@
-import React, { useState, useContext } from "react";
-import { Link } from "react-router-dom";
-import axios from 'axios'
-import { useNavigate } from "react-router-dom";
-import { AuthContext } from '../context/AuthContext';
-
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from 'axios';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Signup() {    
 
-    const [name, setName] = useState()
-    const [email, setEmail] = useState()
-    const [password, setPassword] = useState()
     const navigate = useNavigate()
-    const { login } = useContext(AuthContext);
-
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        axios.post("http://localhost:3001/register", { name, email, password })
-        .then(result => {console.log(result)
-            login();
-        navigate("/home")
-        })
-        .catch(err => console.log(err))
-    }
+    const [inputValue, setInputValue] = useState({
+        email: "",
+        password: "",
+        username: "",
+      });
+      const { email, password, username } = inputValue;
+      
+      const handleOnChange = (e) => {
+        const { name, value } = e.target;
+        setInputValue({
+          ...inputValue,
+          [name]: value,
+        });
+      };
+    
+      const handleError = (err) =>
+        toast.error(err, {
+          position: "bottom-left",
+        });
+      const handleSuccess = (msg) =>
+        toast.success(msg, {
+          position: "bottom-right",
+        });
+    
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+          const { data } = await axios.post(
+            "http://localhost:3002/signup",
+            {
+              ...inputValue,
+            },
+            { withCredentials: true }
+          );
+          const { success, message } = data;
+          if (success) {
+            handleSuccess(message);
+            setTimeout(() => {
+              navigate("/");
+            }, 1000);
+          } else {
+            handleError(message);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+        setInputValue({
+          ...inputValue,
+          email: "",
+          password: "",
+          username: "",
+        });
+      };
 
 
   return (
@@ -32,51 +70,57 @@ function Signup() {
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                     <label htmlFor="email">
-                        <strong>Name</strong>
+                        <strong>Username</strong>
                     </label>
                     <input type="text" 
-                    placeholder='Enter Name' 
-                    autoComplete='off' 
-                    name='email' 
+                    placeholder='Enter your username' 
+                    //autoComplete='off' 
+                   // name='email' 
+                   name="username"
+                   value={username}
                     className='form-control rounded-0'
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={handleOnChange}
                     />
                 </div>
                 <div className="mb-3">
                     <label htmlFor="email">
                         <strong>Email</strong>
                     </label>
-                    <input type="text" 
-                    placeholder='Enter Email' 
-                    autoComplete='off' 
+                    <input type="email" 
+                    placeholder='Enter your Email' 
+                    //autoComplete='off' 
                     name='email' 
+                    value={email}
                     className='form-control rounded-0' 
-                    onChange={(e) => setEmail(e.target.value)}
-
+                    onChange={handleOnChange}
                     />
                 </div>
                 <div className="mb-3">
                     <label htmlFor="email">
                         <strong>Password</strong>
                     </label>
-                    <input type="password" 
-                    placeholder='Enter Password' 
+                    <input 
+                    type="password" 
+                    placeholder='Enter your Password' 
                     name='password' 
+                    value={password}
                     className='form-control rounded-0' 
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={handleOnChange}
 
                     />
                 </div>
                 <button type="submit" className="btn btn-success w-100 rounded-0">
                     Sign Up
                 </button>
-                </form>
-                <p>Already have an account?</p>
+                
+                <span>Already have an account?
                 <Link to="/login" className="btn btn-default border w-100 bg-light rounded-0 text-decoration-none">
                     Login
                 </Link>
-            
+                </span>
+                </form>
         </div>
+        <ToastContainer />
     </div>
   );
 }

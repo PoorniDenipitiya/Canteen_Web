@@ -1,32 +1,63 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios';
-import { AuthContext } from '../context/AuthContext';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Login() {    
 
-    const [email, setEmail] = useState();
-    const [password, setPassword] = useState();
     const navigate = useNavigate();
-    const { login } = useContext(AuthContext);
-
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        axios.post("http://localhost:3001/login", { email, password })
-        .then(result => {
-            console.log(result)
-            if(result.data === "Success"){
-                login();
-                navigate("/home")
-            }else{
-                navigate("/register")
-                alert("You are not registered to this service")
-
-            }
-       
-        })
-        .catch(err => console.log(err))
-    }
+    const [inputValue, setInputValue] = useState({
+        email: "",
+        password: "",
+      });
+      const { email, password } = inputValue;
+      const handleOnChange = (e) => {
+        const { name, value } = e.target;
+        setInputValue({
+          ...inputValue,
+          [name]: value,
+        });
+      };
+    
+      const handleError = (err) =>
+        toast.error(err, {
+          position: "bottom-left",
+        });
+      const handleSuccess = (msg) =>
+        toast.success(msg, {
+          position: "bottom-left",
+        });
+    
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+          const { data } = await axios.post(
+            "http://localhost:3002/login",
+            {
+              ...inputValue,
+            },
+            { withCredentials: true }
+          );
+          console.log(data);
+          const { success, message } = data;
+          if (success) {
+            handleSuccess(message);
+            setTimeout(() => {
+              navigate("/");
+            }, 1000);
+          } else {
+            handleError(message);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+        setInputValue({
+          ...inputValue,
+          email: "",
+          password: "",
+        });
+      };
 
 
   return (
@@ -39,12 +70,14 @@ function Login() {
                     <label htmlFor="email">
                         <strong>Email</strong>
                     </label>
-                    <input type="text" 
-                    placeholder='Enter Email' 
-                    autoComplete='off' 
+                    <input 
+                    type="email" 
+                    placeholder='Enter your Email' 
+                    //autoComplete='off' 
                     name='email' 
+                    value={email}
                     className='form-control rounded-0' 
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={handleOnChange}
 
                     />
                 </div>
@@ -52,24 +85,28 @@ function Login() {
                     <label htmlFor="email">
                         <strong>Password</strong>
                     </label>
-                    <input type="password" 
-                    placeholder='Enter Password' 
+                    <input 
+                    type="password" 
+                    placeholder='Enter your Password' 
                     name='password' 
+                    value={password}
                     className='form-control rounded-0' 
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={handleOnChange}
 
                     />
                 </div>
                 <button type="submit" className="btn btn-success w-100 rounded-1">
                     Login
                 </button>
-                </form>
-                <p>Don't have an account?</p>
-                <Link to="/register" className="btn btn-default border w-100 bg-light rounded-1 text-decoration-none">
+              
+                <span>Don't have an account?
+                <Link to="/signup" className="btn btn-default border w-100 bg-light rounded-1 text-decoration-none">
                     Sign Up
                 </Link>
-            
+                </span>
+                </form>
         </div>
+        <ToastContainer />
     </div>
   );
 }

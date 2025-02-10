@@ -10,29 +10,29 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import Footer from './Components/Footer';
 import Canteen from './Canteen/Canteen';
 import './App.css';
+import Order from './Orders/Order';
 
 function App() {
 
   return (
     <AuthProvider>
-    <BrowserRouter>
     <div className="app-container">
       <Header className="fixed-header" />
       <div className="content">
         <Routes>
          
-          <Route path='/register' element={<Signup/>}/>
-          <Route path='/login' element={<Login/>}/>
-          <Route path='/' element={<Home />}/>
-          <Route path="/canteen" element={Canteen} />
+          <Route path="/signup" element={<Signup/>}/>
+          <Route path="/login" element={<Login/>}/>
+          <Route path="/" element={<Home />}/>
+          <Route path="/canteen" element={<Canteen />} />
+          <Route path="/orders" element={<Order />} />
         </Routes>
         </div>
         <Footer className="fixed-footer" />
       
     </div>
-    </BrowserRouter>
     </AuthProvider>
   )
 }
 
-export default App
+export default App;
