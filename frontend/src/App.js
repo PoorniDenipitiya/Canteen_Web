@@ -11,6 +11,7 @@ import Footer from './Components/Footer';
 import Canteen from './Canteen/Canteen';
 import './App.css';
 import Order from './Orders/Order';
+import About from "./Home/About";
 
 function App() {
 
@@ -26,6 +27,7 @@ function App() {
           <Route path="/" element={<Home />}/>
           <Route path="/canteen" element={<Canteen />} />
           <Route path="/orders" element={<Order />} />
+          <Route path="/about" element={<About />} />
         </Routes>
         </div>
         <Footer className="fixed-footer" />
