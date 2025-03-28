@@ -52,20 +52,4 @@ module.exports.Login = async (req, res, next) => {
     }
   }
 
-  /*module.exports.userVerification = async (req, res) => {
-    // Implement user verification logic here
-    const token = req.cookies.token;
-  if (!token) {
-    return res.json({ status: false });
-  }
-  try {
-    const decoded = jwt.verify(token, process.env.TOKEN_KEY);
-    const user = await UserModel.findById(decoded.id);
-    if (!user) {
-      return res.json({ status: false });
-    }
-    return res.json({ status: true, user: user.username });
-  } catch (error) {
-    return res.json({ status: false });
-  }
-  };*/
+  

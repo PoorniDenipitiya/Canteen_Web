@@ -48,6 +48,7 @@ const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
 const authRoute = require("./Routes/AuthRoute");
+const cartRoute = require("./Routes/CartRoute");
 const { MONGO_URL, PORT } = process.env;
 
 mongoose.set('strictQuery', true);
@@ -74,6 +75,7 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.use("/", authRoute);
+app.use("/", cartRoute);
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
