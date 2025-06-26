@@ -144,6 +144,7 @@ const Order = () => {
         }
           alert("Item added to cart!");
           fetchCart(); // Refresh the cart after adding an item
+          window.dispatchEvent(new Event("cartUpdated")); // Notify other components
         } catch (error) {
           console.error("Error adding item to cart", error);
         }

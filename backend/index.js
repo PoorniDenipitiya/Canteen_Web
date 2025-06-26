@@ -79,6 +79,9 @@ app.use(express.json());
 const payhereRoutes = require('./Routes/payhere');
 app.use('/api/payhere', payhereRoutes);
 
+const orderRoute = require("./Routes/OrderRoute");
+app.use("/", orderRoute);
+
 app.use("/", authRoute);
 app.use("/", cartRoute);
 

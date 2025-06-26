@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
+import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import "./trackOrder.css"; // Create this for styling
 
@@ -7,11 +8,25 @@ const TrackOrder = () => {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
-    const storedOrders = JSON.parse(localStorage.getItem("orders")) || [];
+    // Fetch orders from backend
+    const fetchOrders = async () => {
+      try {
+        const response = await axios.get("http://localhost:3002/api/orders", { withCredentials: true });
+        setOrders(response.data);
+      } catch (error) {
+        setOrders([]);
+      }
+    };
+    fetchOrders();
 
-    // Filter orders relevant to this user
-    const userOrders = storedOrders.filter((order) => order.userId === user?.id); // Optional if using userId
-    setOrders(userOrders.length > 0 ? userOrders : storedOrders); // fallback if no userId filter
+    // Listen for orderPlaced event (same-tab) and storage event (cross-tab)
+    const handleOrderUpdate = () => fetchOrders();
+    window.addEventListener("orderPlaced", handleOrderUpdate);
+    window.addEventListener("storage", handleOrderUpdate);
+    return () => {
+      window.removeEventListener("orderPlaced", handleOrderUpdate);
+      window.removeEventListener("storage", handleOrderUpdate);
+    };
   }, [user]);
 
   const formatDate = (dateStr) => {
@@ -45,8 +60,9 @@ const TrackOrder = () => {
               <th>Order ID</th>
               <th>Canteen Name</th>
               <th>Ordered Date</th>
-             {/* <th>Total price(Rs.)</th> */}
+              <th>Total Price (Rs.)</th>
               <th>Status</th>
+              <th>Payment Mode</th>
             </tr>
           </thead>
           <tbody>
@@ -55,8 +71,9 @@ const TrackOrder = () => {
                 <td>{order.orderId}</td>
                 <td>{order.canteenName}</td>
                 <td>{formatDate(order.orderedDate)}</td>
-               {/* <td>{order.price}</td> */}
+                <td>{order.price ? Number(order.price).toLocaleString() : '-'}</td>
                 <td>{getStatusDot(order.status)}</td>
+                <td>{order.paymentMode ? order.paymentMode.charAt(0).toUpperCase() + order.paymentMode.slice(1) : '-'}</td>
               </tr>
             ))}
           </tbody>

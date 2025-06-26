@@ -48,7 +48,7 @@ const ViewCart = () => {
     // Prepare data for hash
   const paymentData = {
     merchant_id: "1230192", // Use your merchant_id
-    order_id: cart.order_id|| cart.order_id || Math.random().toString(36).substr(2, 9),
+    order_id: cart.orderId || cart.order_id || Math.random().toString(36).substr(2, 9),
     amount: cart.subtotal.toFixed(2),
     currency: "LKR",
   };
@@ -86,8 +86,10 @@ const ViewCart = () => {
 
     window.payhere.startPayment(payment);
 
-    window.payhere.onCompleted = (orderId) => {
+    window.payhere.onCompleted = async (orderId) => {
       alert("Payment completed. Order ID: " + orderId);
+      await placeOrder(cart, "online");
+      navigate("/myorder");
     };
     window.payhere.onDismissed = () => {
       alert("Payment dismissed");
@@ -97,31 +99,79 @@ const ViewCart = () => {
     };
   };
 
+  // Save order to backend and remove cart from backend after order placed
+const saveOrderToBackend = async (cart, paymentMode) => {
+  try {
+    await axios.post(
+      "http://localhost:3002/api/orders",
+      {
+        orderId: cart.orderId || cart.order_id,
+        canteenName: cart.canteenName,
+        price: cart.subtotal,
+        status: "processing",
+        paymentMode,
+        items: cart.items, // Send items to backend
+      },
+      { withCredentials: true }
+    );
+    try {
+      await axios.delete(`http://localhost:3002/api/cart/${cart.orderId || cart.order_id}`, { withCredentials: true });
+      window.dispatchEvent(new Event("cartUpdated"));
+    } catch (deleteErr) {
+      alert("Order placed, but failed to remove cart. Please refresh or contact support.");
+      console.error("Failed to remove cart after order", deleteErr);
+    }
+  } catch (err) {
+    alert("Failed to place order. Please try again.");
+    console.error("Failed to save order to backend", err);
+    throw err;
+  }
+};
+
+// Remove cart from UI after order placed
+const removeCart = (orderId) => {
+  const updatedCartDetails = cartDetails.filter((cart) => cart.orderId !== orderId && cart.order_id !== orderId);
+  setCartDetails(updatedCartDetails);
+  window.dispatchEvent(new Event("cartUpdated"));
+};
+
+// Place order: save to backend, then remove cart from UI
+const placeOrder = async (cart, paymentMode) => {
+  try {
+    await saveOrderToBackend(cart, paymentMode);
+    window.dispatchEvent(new Event("orderPlaced"));
+  } catch (err) {
+    // Error already handled in saveOrderToBackend
+  }
+};
+
+// Handle cash payment for a single cart
+const handleCashPayment = async (cart) => {
+  await placeOrder(cart, "cash");
+  navigate("/myorder");
+};
+
   useEffect(() => {
-    // Fetch cart details from localStorage or API
+    // Fetch cart details from backend
     const fetchCartDetails = async () => {
       if (!isLoggedIn) return;
-
-      // First try to get from localStorage (set in Header component)
-      const storedCartDetails = JSON.parse(localStorage.getItem("cartDetails"));
-
-      if (storedCartDetails && storedCartDetails.length > 0) {
-        setCartDetails(storedCartDetails);
-      } else {
-        // If not in localStorage, fetch from API
-        try {
-          const response = await axios.get("http://localhost:3002/api/cart", {
-            withCredentials: true,
-          });
-          setCartDetails(response.data);
-        } catch (error) {
-          console.error("Error fetching cart details", error);
-        }
+      try {
+        const response = await axios.get("http://localhost:3002/api/cart", { withCredentials: true });
+        setCartDetails(response.data);
+      } catch (error) {
+        setCartDetails([]);
       }
     };
-
     fetchCartDetails();
-  }, [isLoggedIn]);
+    // Listen for cart updates (cross-tab and same-tab)
+    const handleCartUpdate = () => fetchCartDetails();
+    window.addEventListener("cartUpdated", handleCartUpdate);
+    window.addEventListener("orderPlaced", handleCartUpdate);
+    return () => {
+      window.removeEventListener("cartUpdated", handleCartUpdate);
+      window.removeEventListener("orderPlaced", handleCartUpdate);
+    };
+  }, [isLoggedIn, user]);
 
   // Function to toggle expanded cart
   const toggleExpandCart = (index) => {
@@ -195,28 +245,6 @@ const ViewCart = () => {
     0
   );
 
-
-  const handleCashPayment = () => {
-    if (cartDetails.length > 0) {
-      const storedOrders = JSON.parse(localStorage.getItem("orders")) || [];
-      const currentDate = new Date().toISOString(); // ISO for later formatting
-
-      const newOrders = cartDetails.map((cart) => ({
-        orderId: cart.orderId || Math.random().toString(36).substr(2, 9),
-        canteenName: cart.canteenName || "Unknown Canteen",
-        orderedDate: currentDate,
-        price: cart.subtotal,
-        status: "processing",
-      }));
-
-      localStorage.setItem(
-        "orders",
-        JSON.stringify([...storedOrders, ...newOrders])
-      );
-
-      navigate("/myorder");
-    }
-  };
 
   return (
     <div className="cart-container-viewCart">
@@ -360,11 +388,10 @@ const ViewCart = () => {
               >
                 Pay Online
               </button>
-              
               <button
                 className="checkout-btn-viewCart cash"
                 disabled={cartDetails.length === 0}
-                onClick={handleCashPayment}
+                onClick={() => handleCashPayment(cart)}
               >
                 Pay by Cash
               </button>

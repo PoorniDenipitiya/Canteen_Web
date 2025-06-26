@@ -59,6 +59,14 @@ router.get("/api/cart", getUserIdFromToken, async (req, res) => {
   }
 });
 
-
+// Delete cart by orderId
+router.delete("/api/cart/:orderId", getUserIdFromToken, async (req, res) => {
+  try {
+    await Cart.deleteOne({ orderId: req.params.orderId, userId: req.userId });
+    res.status(200).json({ message: "Cart deleted" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete cart" });
+  }
+});
 
 module.exports = router;

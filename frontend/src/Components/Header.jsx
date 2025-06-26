@@ -1,72 +1,49 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "./Header.css"; // Make sure to create a CSS file for styling
+import "./Header.css";
 import { Button } from "bootstrap";
 import { AuthContext } from "../context/AuthContext";
-import axios from "axios";
 import { useCookies } from "react-cookie";
 import { NavLink } from "react-router-dom";
+import axios from "axios";
 
 const Header = () => {
   const { isLoggedIn, user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
-
   const [cartCount, setCartCount] = useState(0);
   const [cartDetails, setCartDetails] = useState([]);
 
   useEffect(() => {
-    const carts = JSON.parse(localStorage.getItem("carts")) || [];
-    setCartCount(carts.length); // Update the cart count based on the number of carts
-  }, []);
-
-  useEffect(() => {
+    // Fetch cart details from backend
     const fetchCartDetails = async () => {
-      if (!isLoggedIn) return; // Only fetch if logged in
+      if (!isLoggedIn) return;
       try {
         const response = await axios.get("http://localhost:3002/api/cart", {
           withCredentials: true,
         });
-        setCartDetails(response.data);
-        setCartCount(response.data.length);
+        let filteredCarts = response.data;
+        if (user && user.id) {
+          filteredCarts = response.data.filter((cart) => cart.userId === user.id);
+        }
+        setCartDetails(filteredCarts);
+        setCartCount(filteredCarts.length);
       } catch (error) {
-        console.error("Error fetching cart details", error);
+        setCartDetails([]);
+        setCartCount(0);
       }
     };
-
     fetchCartDetails();
-  }, [isLoggedIn]);
-
-  /* useEffect(() => {
-        const verifyCookie = async () => {
-          if (!cookies.token) {
-            setUsername('');
-            return;
-          }
-          try {
-            const { data } = await axios.post(
-              'http://localhost:3002/verify-cookie',
-              {},
-              { withCredentials: true }
-            );
-            const { status, user } = data;
-            if (status) {
-              setUsername(user);
-            } else {
-              removeCookie('token');
-              setUsername('');
-            }
-          } catch (error) {
-            console.error('Network Error', error);
-            removeCookie('token');
-            setUsername('');
-          }
-        };
-        verifyCookie();
-      }, [cookies, removeCookie]);*/
+    // Listen for cart updates
+    const handleCartUpdate = () => fetchCartDetails();
+    window.addEventListener("cartUpdated", handleCartUpdate);
+    window.addEventListener("orderPlaced", handleCartUpdate);
+    return () => {
+      window.removeEventListener("cartUpdated", handleCartUpdate);
+      window.removeEventListener("orderPlaced", handleCartUpdate);
+    };
+  }, [user, isLoggedIn]);
 
   const handleLogout = () => {
-    // removeCookie('token');
-    //setUsername('');
     logout();
     navigate("/login");
   };
@@ -78,9 +55,6 @@ const Header = () => {
       </div>
 
       <nav className="header__nav">
-        {/* <Link to="/">Home</Link>
-                <Link to="/about">About</Link>
-                <Link to="/orders">Orders</Link>*/}
         <NavLink
           to="/"
           className={({ isActive }) => (isActive ? "active-link" : "")}
@@ -99,7 +73,6 @@ const Header = () => {
         >
           Orders
         </NavLink>
-        {/*  <Link to="/contact">Contact</Link> */}
       </nav>
 
       <div className="header__right">
@@ -116,20 +89,20 @@ const Header = () => {
                     <p>Canteen: {cart.canteenName}</p>
                     <p>No. of Items: {cart.items.length}</p>
                     <p>Subtotal: Rs.{cart.subtotal}.00</p>
-                    {/*<Link to="/cart" className="view-cart-btn">View Cart</Link> */}
-                    <Link
-                      to="/cart"
-                      className="view-cart-btn"
-                      onClick={() =>
-                        localStorage.setItem(
-                          "cartDetails",
-                          JSON.stringify(cartDetails)
-                        )
-                      }
-                    >
-                      View Cart
-                    </Link>
-                    <button className="checkout-btn">Checkout</button>
+                    <div className="cart-btn-wrapper">
+                      <Link
+                        to="/cart"
+                        className="view-cart-btn"
+                        onClick={() =>
+                          localStorage.setItem(
+                            "cartDetails",
+                            JSON.stringify(cartDetails)
+                          )
+                        }
+                      >
+                        View Cart
+                      </Link>
+                    </div>
                   </div>
                 ))
               ) : (
