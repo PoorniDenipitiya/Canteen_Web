@@ -49,7 +49,7 @@ router.post("/api/cart", getUserIdFromToken, async (req, res) => {
   }
 });
 
-// Get all carts
+// Get all user's carts
 router.get("/api/cart", getUserIdFromToken, async (req, res) => {
   try {
     const carts = await Cart.find({ userId: req.userId });

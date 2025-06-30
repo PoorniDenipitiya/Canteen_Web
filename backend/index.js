@@ -67,9 +67,9 @@ mongoose
 
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: ["http://localhost:3000", "http://localhost:3001"], // 👈 allow BOTH User Portal frontend & Admin Panel frontend
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"]
   })
 );
 app.use(cookieParser());

@@ -107,7 +107,8 @@ const Order = () => {
     // Function to fetch the cart
     const fetchCart = async () => {
         try {
-            const { data } = await axios.get(`http://localhost:3002/api/cart`);
+            // Add withCredentials to send cookies (for session-based auth)
+            const { data } = await axios.get(`http://localhost:3002/api/cart`, { withCredentials: true });
             setCart(data); // Update the cart state with the fetched data
             console.log("Cart fetched successfully:", data);
         } catch (error) {

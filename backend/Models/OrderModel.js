@@ -5,7 +5,11 @@ const orderSchema = new mongoose.Schema({
   orderId: { type: String, required: true, unique: true },
   canteenName: { type: String, required: true },
   price: { type: Number, required: true },
-  status: { type: String, default: "processing" },
+  status: { 
+    type: String, 
+    enum: ["order placed", "accepted", "processing", "order ready", "collected"],
+    default: "order placed" 
+  },
   paymentMode: { type: String, enum: ["online", "cash"], required: true },
   orderedDate: { type: Date, default: Date.now },
   items: [

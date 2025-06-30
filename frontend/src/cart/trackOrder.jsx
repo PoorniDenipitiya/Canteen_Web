@@ -36,8 +36,10 @@ const TrackOrder = () => {
 
   const getStatusDot = (status) => {
     const colors = {
-      processing: "#FFA500",
-      completed: "#4CAF50",
+      "order placed": "#999",
+      accepted: "#FFA500",
+      processing: "#FFD700",
+      "order ready": "#4CAF50",
       collected: "#2196F3",
     };
     return (

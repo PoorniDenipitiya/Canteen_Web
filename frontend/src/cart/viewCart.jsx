@@ -255,7 +255,7 @@ const handleCashPayment = async (cart) => {
         {cartDetails.length > 0 ? (
           <>
             {cartDetails.map((cart, cartIndex) => (
-              <React.Fragment key={cart.orderId || cartIndex} className="cart-section">
+              <div key={cart.orderId || cartIndex} className="cart-section">
                 <div
                   className="cart-header"
                   onClick={() => toggleExpandCart(cartIndex)}
@@ -264,15 +264,12 @@ const handleCashPayment = async (cart) => {
                     Cart {cartIndex + 1} :{" "}
                     {cart.canteenName || "Unknown Canteen"}
                   </h4>
-
-                  {/*  <h4>Cart from {cart.canteenName || "Unknown Canteen"}</h4> */}
                   <div className="cart-summary-mini">
                     <span>Order ID: {cart.orderId}</span> /
                     <span>Items: {cart.items.length}</span> /
                     <span>Total: Rs.{cart.subtotal}.00</span>
                   </div>
                 </div>
-
                 {expandedCart === cartIndex && (
                   <table>
                     <thead>
@@ -351,7 +348,7 @@ const handleCashPayment = async (cart) => {
                     </tbody>
                   </table>
                 )}
-              </React.Fragment>
+              </div>
             ))}
           </>
         ) : (
