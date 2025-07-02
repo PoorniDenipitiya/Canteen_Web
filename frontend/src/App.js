@@ -14,6 +14,7 @@ import Order from './Orders/Order';
 import About from "./Home/About";
 import Cart from './cart/viewCart';
 import TrackOrder from './cart/trackOrder';
+import Complaint from './complaint/complaint';
 
 function App() {
 
@@ -32,6 +33,7 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/myorder" element={<TrackOrder />} />
+          <Route path="/complaint" element={<Complaint />} />
         </Routes>
         </div>
         <Footer className="fixed-footer" />

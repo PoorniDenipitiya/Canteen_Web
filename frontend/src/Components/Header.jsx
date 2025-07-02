@@ -73,6 +73,12 @@ const Header = () => {
         >
           Orders
         </NavLink>
+        <NavLink
+          to="/complaint"
+          className={({ isActive }) => (isActive ? "active-link" : "")}
+        >
+          Complaints
+        </NavLink>
       </nav>
 
       <div className="header__right">

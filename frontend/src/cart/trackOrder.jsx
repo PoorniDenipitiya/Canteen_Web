@@ -62,9 +62,10 @@ const TrackOrder = () => {
               <th>Order ID</th>
               <th>Canteen Name</th>
               <th>Ordered Date</th>
-              <th>Total Price (Rs.)</th>
+              <th>Total Price (Rs.)</th> 
               <th>Status</th>
               <th>Payment Mode</th>
+              
             </tr>
           </thead>
           <tbody>
