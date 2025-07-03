@@ -85,6 +85,9 @@ app.use("/", orderRoute);
 app.use("/", authRoute);
 app.use("/", cartRoute);
 
+const complaintRoute = require('./Routes/ComplaintRoute');
+app.use('/api/complaints', complaintRoute);
+
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
 });
