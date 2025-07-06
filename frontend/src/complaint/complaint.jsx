@@ -14,6 +14,7 @@ const TrackOrder = () => {
   const [imageFile, setImageFile] = useState(null);
   const [errorFields, setErrorFields] = useState({});
   const [complaints, setComplaints] = useState([]);
+  const [title, setTitle] = useState("");
 
   const fetchComplaints = async () => {
       try {
@@ -57,6 +58,7 @@ const TrackOrder = () => {
     setSelectedOrder(order);
     setComplaintType("");
     setDescription("");
+    setTitle("");
     setImageFile(null);
     setErrorFields({});
     setShowForm(true);
@@ -91,6 +93,7 @@ const TrackOrder = () => {
     formData.append("price", selectedOrder.price);
     formData.append("paymentMode", selectedOrder.paymentMode);
     formData.append("complaintType", complaintType);
+    formData.append("title", title);
     formData.append("description", description);
     if (imageFile) formData.append("image", imageFile);
 
@@ -105,6 +108,7 @@ const TrackOrder = () => {
       setSelectedOrder(null);
       setComplaintType("");
       setDescription("");
+      setTitle("");
       setImageFile(null);
       setErrorFields({});
     } catch (err) {
@@ -175,6 +179,8 @@ const TrackOrder = () => {
           order={selectedOrder}
           complaintType={complaintType}
           setComplaintType={setComplaintType}
+          title={title}
+          setTitle={setTitle}
           description={description}
           setDescription={setDescription}
           imageFile={imageFile}
