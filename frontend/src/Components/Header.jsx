@@ -1,10 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, NavLink } from "react-router-dom";
 import "./Header.css";
-import { Button } from "bootstrap";
 import { AuthContext } from "../context/AuthContext";
-import { useCookies } from "react-cookie";
-import { NavLink } from "react-router-dom";
 import axios from "axios";
 
 const Header = () => {
@@ -28,6 +25,7 @@ const Header = () => {
         setCartDetails(filteredCarts);
         setCartCount(filteredCarts.length);
       } catch (error) {
+        console.error("Failed to fetch cart details:", error);
         setCartDetails([]);
         setCartCount(0);
       }

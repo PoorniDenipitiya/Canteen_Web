@@ -15,6 +15,7 @@ const getUserIdFromToken = (req, res, next) => {
     req.user = { id: decoded.id };
     next();
   } catch (error) {
+    console.error('JWT verification error:', error);
     return res.status(401).json({ error: 'Invalid token' });
   }
 };

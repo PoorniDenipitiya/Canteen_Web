@@ -10,7 +10,8 @@ async function submitComplaint(req, res) {
       return res.status(400).json({ message: "All required fields must be filled." });
     }
 
-    let imageName = undefined;
+
+    let imageName;
     if (image) {
       const { data, error } = await supabase
         .storage
