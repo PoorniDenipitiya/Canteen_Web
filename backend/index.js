@@ -88,6 +88,9 @@ app.use("/", cartRoute);
 const complaintRoute = require('./Routes/ComplaintRoute');
 app.use('/api/complaints', complaintRoute);
 
+const favoriteRoute = require('./Routes/FavoriteRoute');
+app.use('/api/favorites', favoriteRoute);
+
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
 });

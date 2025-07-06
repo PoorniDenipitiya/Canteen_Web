@@ -125,7 +125,6 @@ const Header = () => {
               <span>Welcome {user || "Guest"}!</span>
               <hr></hr>
               <Link to="/profile">Profile</Link>
-              <Link to="/myfavorites">My Favorites</Link>
               <Link to="/myorder">My Orders</Link>
               <button onClick={handleLogout}>Logout</button>
             </div>
