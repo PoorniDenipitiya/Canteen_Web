@@ -5,6 +5,8 @@ const ComplaintForm = ({
   order,
   complaintType,
   setComplaintType,
+  title,
+  setTitle,
   description,
   setDescription,
   imageFile,
@@ -17,6 +19,7 @@ const ComplaintForm = ({
   console.log('ComplaintForm values:', {
     order,
     complaintType,
+    title,
     description,
     imageFile,
     errorFields
@@ -72,6 +75,19 @@ const ComplaintForm = ({
               <label>Upload Image</label>
               <input type="file" accept="image/*" onChange={e => setImageFile(e.target.files[0])} />
               {imageFile && <span className="file-name">{imageFile.name}</span>}
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group full-width">
+              <label>Title <span className="required">*</span></label>
+              <input
+                type="text"
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+                required
+                placeholder="Enter a short title for your complaint"
+              />
+              {errorFields.title && <span className="error-msg">Required</span>}
             </div>
           </div>
           <div className="form-row">

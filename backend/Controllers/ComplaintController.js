@@ -3,10 +3,10 @@ const { supabase } = require("../supabaseconfig");
 
 async function submitComplaint(req, res) {
   try {
-    const { orderId, canteenName, orderedDate, price, paymentMode, complaintType, description } = req.body;
+    const { orderId, canteenName, orderedDate, price, paymentMode, complaintType, title, description } = req.body;
     const image = req.file;
 
-    if (!orderId || !canteenName || !orderedDate || !price || !paymentMode || !complaintType || !description) {
+    if (!orderId || !canteenName || !orderedDate || !price || !paymentMode || !complaintType || !title || !description) {
       return res.status(400).json({ message: "All required fields must be filled." });
     }
 
@@ -31,6 +31,7 @@ async function submitComplaint(req, res) {
       price,
       paymentMode,
       complaintType,
+      title,
       description,
       image: imageName,
       userId: req.user.id
@@ -51,7 +52,18 @@ async function getUserComplaints(req, res) {
   }
 }
 
+// Fetch all complaints (public)
+async function getAllComplaints(req, res) {
+  try {
+    const complaints = await Complaint.find().sort({ createdAt: -1 });
+    res.json(complaints);
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+}
+
 module.exports = {
   submitComplaint,
-  getUserComplaints
+  getUserComplaints,
+  getAllComplaints
 };

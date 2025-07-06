@@ -28,4 +28,7 @@ router.post('/', getUserIdFromToken, upload.single('image'), ComplaintController
 // GET /api/complaints - Get all complaints for the logged-in user
 router.get('/', getUserIdFromToken, ComplaintController.getUserComplaints);
 
+// GET /api/complaints/all - Public: fetch all submitted complaints
+router.get('/all', ComplaintController.getAllComplaints);
+
 module.exports = router;

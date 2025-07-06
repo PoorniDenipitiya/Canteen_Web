@@ -2,7 +2,7 @@
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,0.4);
-  z-index: 1000;
+  z-index: 2000; /* Increased to ensure popup is above header/footer */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -16,6 +16,8 @@
   box-shadow: 0 8px 32px rgba(0,0,0,0.18);
   position: relative;
   animation: fadeIn 0.2s;
+  max-height: 90vh; /*For vertical scrolling bar */
+  overflow-y: auto; /*For vertical scrolling bar*/
 }
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.98); }
