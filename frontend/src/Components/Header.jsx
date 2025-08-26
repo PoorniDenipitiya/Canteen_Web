@@ -1,4 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
+import Badge from '@mui/material/Badge';
+import Notification from "./Notification";
 import { Link, useNavigate, NavLink } from "react-router-dom";
 import "./Header.css";
 import { AuthContext } from "../context/AuthContext";
@@ -81,39 +83,60 @@ const Header = () => {
 
       <div className="header__right">
         {isLoggedIn && (
-          <div className="cart-icon-header">
-            <i className="fas fa-cart-plus cart-icon-header "></i>
-            <span className="cart-count">({cartCount})</span>
-            <div className="cart-dropdown">
-              {cartDetails.length > 0 ? (
-                cartDetails.map((cart, index) => (
-                  <div key={cart.orderId} className="cart-item">
-                    <h4>Cart {index + 1}</h4>
-                    <p>Order ID: {cart.orderId}</p>
-                    <p>Canteen: {cart.canteenName}</p>
-                    <p>No. of Items: {cart.items.length}</p>
-                    <p>Subtotal: Rs.{cart.subtotal}.00</p>
-                    <div className="cart-btn-wrapper">
-                      <Link
-                        to="/cart"
-                        className="view-cart-btn"
-                        onClick={() =>
-                          localStorage.setItem(
-                            "cartDetails",
-                            JSON.stringify(cartDetails)
-                          )
-                        }
-                      >
-                        View Cart
-                      </Link>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="empty-cart">Your cart is empty.</p>
-              )}
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <div className="cart-icon-header" style={{ position: 'relative', display: 'inline-block', verticalAlign: 'middle', marginRight: '20px' }}>
+                <Badge
+                  badgeContent={cartCount}
+                  color="primary"
+                  overlap="circular"
+                  anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                  sx={{
+                    '& .MuiBadge-badge': {
+                      right: 10,
+                      top: 5,
+                      minWidth: '20px',
+                      height: '20px',
+                      fontSize: '0.75rem',
+                    }
+                  }}
+                >
+                  <i className="fas fa-cart-plus cart-icon-header" style={{ fontSize: '24px', color: '#fff', verticalAlign: 'middle' }}></i>
+                </Badge>
+                <div className="cart-dropdown">
+                  {cartDetails.length > 0 ? (
+                    cartDetails.map((cart, index) => (
+                      <div key={cart.orderId} className="cart-item">
+                        <h4>Cart {index + 1}</h4>
+                        <p>Order ID: {cart.orderId}</p>
+                        <p>Canteen: {cart.canteenName}</p>
+                        <p>No. of Items: {cart.items.length}</p>
+                        <p>Subtotal: Rs.{cart.subtotal}.00</p>
+                        <div className="cart-btn-wrapper">
+                          <Link
+                            to="/cart"
+                            className="view-cart-btn"
+                            onClick={() =>
+                              localStorage.setItem(
+                                "cartDetails",
+                                JSON.stringify(cartDetails)
+                              )
+                            }
+                          >
+                            View Cart
+                          </Link>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="empty-cart">Your cart is empty.</p>
+                  )}
+                </div>
+              </div>
+              {/* Notification icon next to cart icon */}
+              <div style={{ marginRight: '20px' }}>
+                <Notification />
+              </div>
             </div>
-          </div>
         )}
         {isLoggedIn ? (
           <div className="user-menu">

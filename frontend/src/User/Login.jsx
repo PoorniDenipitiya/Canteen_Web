@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import backgroundImage from "../Assets/background.jpeg";
+import SocialLogin from "./SocialLogin";
+import "./SocialAuthStyles.css";
+import { AuthContext } from "../context/AuthContext";
 
 function Login() {
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const [inputValue, setInputValue] = useState({
     email: "",
@@ -60,6 +64,59 @@ function Login() {
     });
   };
 
+  // Social Login handler for Google and Facebook
+  const handleSocialLogin = async (userInfo, provider) => {
+    try {
+      let payload = {};
+      if (provider === "google") {
+        // userInfo is the Google credential response
+        payload = {
+          provider: "google",
+          credential: userInfo.credential,
+        };
+      } /*else if (provider === "facebook") {
+        // userInfo is the Facebook user info object
+        payload = {
+          provider: "facebook",
+          email: userInfo.email,
+          username: userInfo.username,
+          providerId: userInfo.providerId,
+        };
+      }*/
+      const { data } = await axios.post(
+        "http://localhost:3002/social-login",
+        payload,
+        { withCredentials: true }
+      );
+      const { success, message } = data;
+      if (success && provider === "google") {
+        handleSuccess(message);
+        // Immediately fetch user info and set context
+        const { data: verifyData } = await axios.post(
+          "http://localhost:3002/verify-cookie",
+          {},
+          { withCredentials: true }
+        );
+        if (verifyData.status) {
+          login(verifyData.user);
+        }
+        setTimeout(() => {
+          navigate("/");
+        }, 1000);
+      } else if (success) {
+        handleSuccess(message);
+        setTimeout(() => {
+          navigate("/");
+        }, 1000);
+      } else {
+        handleError(message);
+      }
+    } catch (error) {
+      console.log(error);
+      handleError("Social login failed. Please try again.");
+    }
+  };
+
   return (
     /* <div className="d-flex justify-content-center align-items-center bg-secondary vh-100">*/
     <div
@@ -111,16 +168,23 @@ function Login() {
           >
             Login
           </button>
-
-          <span>
-            Don't have an account?
+          <div className="separator" style={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}>
+            <div style={{ flex: 1, height: '1px', background: '#ccc' }} />
+            <span style={{ margin: '0 10px', color: '#888' }}>or</span>
+            <div style={{ flex: 1, height: '1px', background: '#ccc' }} />
+          </div>
+          <div className="social-auth-container" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <SocialLogin onSuccess={handleSocialLogin} googleButtonText="Login with Google" fbButtonText="Sign Up with Facebook" />
+          </div>
+          <div style={{ marginTop: '18px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+            <span style={{ marginRight: '8px' }}>Don't have an account?</span>
             <Link
               to="/signup"
-              className="btn btn-default border w-100 bg-light rounded-1 text-decoration-none"
+              style={{ color: '#1976d2', fontWeight: 500, textDecoration: 'none', cursor: 'pointer' }}
             >
-              Sign Up
+              Sign up
             </Link>
-          </span>
+          </div>
         </form>
       </div>
       <ToastContainer />

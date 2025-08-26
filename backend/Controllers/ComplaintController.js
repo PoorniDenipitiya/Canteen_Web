@@ -25,6 +25,46 @@ async function submitComplaint(req, res) {
       imageName = data.path;
     }
 
+    // Get user email from UserModel using userId
+    const UserModel = require("../Models/UserModel");
+    let userEmail = "";
+    try {
+      const userDoc = await UserModel.findById(req.user.id);
+      if (userDoc && userDoc.email) {
+        userEmail = userDoc.email;
+      }
+    } catch (err) {
+      // fallback: leave userEmail blank
+    }
+
+    // Send email to admin using nodemailer
+    const nodemailer = require("nodemailer");
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+      tls: {
+       rejectUnauthorized: false,
+      },
+    });
+
+    const mailOptions = {
+      from: userEmail || process.env.EMAIL_USER,
+      to: process.env.EMAIL_USER,
+      subject: `Complaint Received : ${complaintType}`,
+      text: `A new complaint has been submitted.\n\nOrder ID: ${orderId}\nCanteen Name: ${canteenName}\nOrdered Date: ${orderedDate}\nPrice: ${price}\nPayment Mode: ${paymentMode}\n\nTitle: ${title}\nDescription: ${description}\n\nSubmitted by: ${userEmail}`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending complaint email:", error);
+      } else {
+        console.log("Complaint email sent:", info.response);
+      }
+    });
+
     const complaint = new Complaint({
       orderId,
       canteenName,

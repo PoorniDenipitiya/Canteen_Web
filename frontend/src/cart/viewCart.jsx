@@ -102,10 +102,12 @@ const ViewCart = () => {
   // Save order to backend and remove cart from backend after order placed
 const saveOrderToBackend = async (cart, paymentMode) => {
   try {
+    // Always generate a unique orderId for new orders
+    const uniqueOrderId = `ORD-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
     await axios.post(
       "http://localhost:3002/api/orders",
       {
-        orderId: cart.orderId || cart.order_id,
+        orderId: uniqueOrderId,
         canteenName: cart.canteenName,
         price: cart.subtotal,
         status: "processing",

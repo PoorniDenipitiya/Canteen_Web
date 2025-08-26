@@ -11,7 +11,8 @@ const ComplaintSchema = new mongoose.Schema({
   description: { type: String, required: true },
   image: { type: String }, // store image filename or URL
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true },
-  status: { type: String, default: 'submitted', enum: ['submitted', 'on investigation', 'investigation completed', 'complaint close'] },
+  status: { type: String, default: 'Pending', enum: ['Pending', 'On Investigation', 'On Mo Investigation', 'Investigation Completed', 'Complaint Closed'] },
+  action: { type: String, default: '-----', enum: ['-----', 'Refund', 'Reject'] },
   createdAt: { type: Date, default: Date.now }
 });
 

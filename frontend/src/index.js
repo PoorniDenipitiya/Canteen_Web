@@ -6,15 +6,18 @@ import reportWebVitals from './reportWebVitals';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
 //  <React.StrictMode> //recommended to keep Strict Mode enabled during development to catch potential issues early.
-<AuthProvider>
+<GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+  <AuthProvider>
     <BrowserRouter>
     <App />
     </BrowserRouter>
     </AuthProvider>
+</GoogleOAuthProvider>
  // </React.StrictMode>
  
 );

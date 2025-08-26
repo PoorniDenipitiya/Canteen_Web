@@ -23,11 +23,19 @@ const userSchema = new mongoose.Schema({
   username: {
     type: String,
     required: [true, "Your username is required"],
-    //unique: true,
   },
   password: {
     type: String,
-    required: [true, "Your password is required"],
+    required: function() { return this.provider === "local"; },
+  },
+  provider: {
+    type: String,
+    enum: ["local", "google", "facebook"],
+    default: "local",
+  },
+  providerId: {
+    type: String,
+    default: null,
   },
   createdAt: {
     type: Date,
@@ -36,7 +44,9 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.pre("save", async function () {
-  this.password = await bcrypt.hash(this.password, 12);
+  if (this.provider === "local" && this.password) {
+    this.password = await bcrypt.hash(this.password, 12);
+  }
 });
 
 module.exports = mongoose.model("users", userSchema);
