@@ -21,11 +21,10 @@ mongoose
   .then(() => console.log("MongoDB is  connected successfully"))
   .catch((err) => console.error(err));
 
-
-
+const config = require("./config/loadConfig");
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:3001"], // 👈 allow BOTH User Portal frontend & Admin Panel frontend
+    origin: config.cors.origins,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"]
   })

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
+import config from '../config/appConfig';
 import { AuthContext } from "../context/AuthContext";
 import "./trackOrder.css"; // Create this for styling
 
@@ -11,7 +12,7 @@ const TrackOrder = () => {
     // Fetch orders from backend
     const fetchOrders = async () => {
       try {
-        const response = await axios.get("http://localhost:3002/api/orders", { withCredentials: true });
+  const response = await axios.get(`${config.api_base_urls.user}/api/orders`, { withCredentials: true });
         setOrders(response.data);
       } catch (error) {
         setOrders([]);

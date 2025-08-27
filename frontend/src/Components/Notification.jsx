@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef, useContext } from 'react';
 import axios from 'axios';
+import config from '../config/appConfig';
 import { AuthContext } from '../context/AuthContext';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -58,10 +59,10 @@ export default function Notification() {
     const fetchUserOrdersAndComplaints = async () => {
       try {
         // Fetch orders
-        const resOrders = await axios.get("http://localhost:3002/api/orders", { withCredentials: true });
+  const resOrders = await axios.get(`${config.api_base_urls.user}/api/orders`, { withCredentials: true });
         const orders = Array.isArray(resOrders.data) ? resOrders.data : [];
         // Fetch complaints
-        const resComplaints = await axios.get("http://localhost:3002/api/complaints", { withCredentials: true });
+  const resComplaints = await axios.get(`${config.api_base_urls.user}/api/complaints`, { withCredentials: true });
         const complaints = Array.isArray(resComplaints.data) ? resComplaints.data : [];
 
         // Track status change times for both

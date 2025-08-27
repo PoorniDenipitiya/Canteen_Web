@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import config from '../config/appConfig';
 import './Order.css';
 import cake from '../Assets/cake.jpeg'; // Default image
 
@@ -18,7 +19,7 @@ const Order = () => {
   const fetchCart = async () => {
       try {
           // Add withCredentials to send cookies (for session-based auth)
-          const { data } = await axios.get(`http://localhost:3002/api/cart`, { withCredentials: true });
+          const { data } = await axios.get(`${config.api_base_urls.user}/api/cart`, { withCredentials: true });
           setCart(data); // Update the cart state with the fetched data
           console.log("Cart fetched successfully:", data);
       } catch (error) {
@@ -35,7 +36,7 @@ const Order = () => {
     
       try {
           if (currentCart) {
-        await axios.post("http://localhost:3002/api/cart", {
+  await axios.post(`${config.api_base_urls.user}/api/cart`, {
           orderId: currentCart.orderId,
           canteenName: selectedCanteen,
           items: [cartItem],
@@ -43,7 +44,7 @@ const Order = () => {
       } else {
           // Create a new cart for the selected canteen
           const orderId = generateOrderId();
-          await axios.post("http://localhost:3002/api/cart", {
+          await axios.post(`${config.api_base_urls.user}/api/cart`, {
               orderId,
               canteenName: selectedCanteen,
               items: [cartItem],
@@ -91,7 +92,7 @@ const Order = () => {
 
       const fetchCategories = async () => {
           try {
-              const { data } = await axios.get('http://localhost:5000/api/categories');
+              const { data } = await axios.get(`${config.api_base_urls.admin}/api/categories`);
               const uniqueCategories = ['All', ...new Set(data.map(category => category.category))];
               setCategories(uniqueCategories);
           } catch (error) {
@@ -101,7 +102,7 @@ const Order = () => {
 
       const fetchFoods = async () => {
           try {
-              const { data } = await axios.get('http://localhost:5000/api/foods');
+              const { data } = await axios.get(`${config.api_base_urls.admin}/api/foods`);
               setFoods(data);
           } catch (error) {
               console.error("Error fetching foods", error);
@@ -118,7 +119,7 @@ const Order = () => {
   useEffect(() => {
     const fetchFavorites = async () => {
       try {
-        const { data } = await axios.get('http://localhost:3002/api/favorites', { withCredentials: true });
+  const { data } = await axios.get(`${config.api_base_urls.user}/api/favorites`, { withCredentials: true });
         setFavorites(data);
       } catch (error) {
         console.error("Error fetching favorites", error);
@@ -132,7 +133,7 @@ const Order = () => {
   const toggleFavorite = async (foodId) => {
     try {
       const { data } = await axios.post(
-        'http://localhost:3002/api/favorites/toggle',
+        `${config.api_base_urls.user}/api/favorites/toggle`,
         { foodId },
         { withCredentials: true }
       );

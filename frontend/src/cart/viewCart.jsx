@@ -13,6 +13,7 @@ export default CartPage;
 
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
+import config from '../config/appConfig';
 import "./viewCart.css";
 import { FaTrash, FaPlus, FaMinus } from "react-icons/fa";
 import { AuthContext } from "../context/AuthContext";
@@ -56,7 +57,7 @@ const ViewCart = () => {
   // Get hash from backend
   let hash = "";
   try {
-    const response = await axios.post("http://localhost:3002/api/payhere/hash", paymentData);
+  const response = await axios.post(`${config.api_base_urls.user}/api/payhere/hash`, paymentData);
     hash = response.data.hash;
   } catch (err) {
     alert("Failed to get payment hash");
@@ -67,9 +68,9 @@ const ViewCart = () => {
       ...paymentData,
       sandbox: true,
       merchant_id: "1230192",
-      return_url: "http://localhost:3000/return",
-      cancel_url: "http://localhost:3000/cancel",
-      notify_url: "http://localhost:5000/api/payments/notify",
+  return_url: `${window.location.origin}/return`,
+  cancel_url: `${window.location.origin}/cancel`,
+  notify_url: `${config.api_base_urls.admin}/api/payments/notify`,
       items: cart.canteenName || `Cart ${cartIndex + 1}`,
       first_name: user?.firstName || "User",
       last_name: user?.lastName || "",
@@ -105,7 +106,7 @@ const saveOrderToBackend = async (cart, paymentMode) => {
     // Always generate a unique orderId for new orders
     const uniqueOrderId = `ORD-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
     await axios.post(
-      "http://localhost:3002/api/orders",
+  `${config.api_base_urls.user}/api/orders`,
       {
         orderId: uniqueOrderId,
         canteenName: cart.canteenName,
@@ -117,7 +118,7 @@ const saveOrderToBackend = async (cart, paymentMode) => {
       { withCredentials: true }
     );
     try {
-      await axios.delete(`http://localhost:3002/api/cart/${cart.orderId || cart.order_id}`, { withCredentials: true });
+  await axios.delete(`${config.api_base_urls.user}/api/cart/${cart.orderId || cart.order_id}`, { withCredentials: true });
       window.dispatchEvent(new Event("cartUpdated"));
     } catch (deleteErr) {
       alert("Order placed, but failed to remove cart. Please refresh or contact support.");
@@ -158,7 +159,7 @@ const handleCashPayment = async (cart) => {
     const fetchCartDetails = async () => {
       if (!isLoggedIn) return;
       try {
-        const response = await axios.get("http://localhost:3002/api/cart", { withCredentials: true });
+  const response = await axios.get(`${config.api_base_urls.user}/api/cart`, { withCredentials: true });
         setCartDetails(response.data);
       } catch (error) {
         setCartDetails([]);

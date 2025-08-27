@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
+import config from '../config/appConfig';
 import { AuthContext } from "../context/AuthContext";
 import "./complaint.css";
 import ComplaintForm from "./ComplaintForm";
@@ -18,7 +19,7 @@ const TrackOrder = () => {
 
   const fetchComplaints = async () => {
       try {
-        const response = await axios.get("http://localhost:3002/api/complaints", { withCredentials: true });
+  const response = await axios.get(`${config.api_base_urls.user}/api/complaints`, { withCredentials: true });
         setComplaints(response.data);
       } catch (error) {
         setComplaints([]);
@@ -29,7 +30,7 @@ const TrackOrder = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await axios.get("http://localhost:3002/api/orders", { withCredentials: true });
+  const response = await axios.get(`${config.api_base_urls.user}/api/orders`, { withCredentials: true });
         setOrders(response.data);
       } catch (error) {
         setOrders([]);
@@ -98,7 +99,7 @@ const TrackOrder = () => {
     if (imageFile) formData.append("image", imageFile);
 
     try {
-      await axios.post("http://localhost:3002/api/complaints", formData, {
+  await axios.post(`${config.api_base_urls.user}/api/complaints`, formData, {
         withCredentials: true,
         headers: { "Content-Type": "multipart/form-data" },
       });

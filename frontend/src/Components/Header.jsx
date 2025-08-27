@@ -5,6 +5,7 @@ import { Link, useNavigate, NavLink } from "react-router-dom";
 import "./Header.css";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
+import config from '../config/appConfig';
 
 const Header = () => {
   const { isLoggedIn, user, logout } = useContext(AuthContext);
@@ -17,7 +18,7 @@ const Header = () => {
     const fetchCartDetails = async () => {
       if (!isLoggedIn) return;
       try {
-        const response = await axios.get("http://localhost:3002/api/cart", {
+  const response = await axios.get(`${config.api_base_urls.user}/api/cart`, {
           withCredentials: true,
         });
         let filteredCarts = response.data;

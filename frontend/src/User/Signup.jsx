@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import config from '../config/appConfig';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import backgroundImage from "../Assets/background.jpeg";
@@ -38,7 +39,7 @@ function Signup() {
     e.preventDefault();
     try {
       const { data } = await axios.post(
-        "http://localhost:3002/signup",
+  `${config.api_base_urls.user}/signup`,
         {
           ...inputValue,
         },
@@ -84,7 +85,7 @@ function Signup() {
         };
       }*/
       const { data } = await axios.post(
-        "http://localhost:3002/social-signup",
+  `${config.api_base_urls.user}/social-signup`,
         payload,
         { withCredentials: true }
       );

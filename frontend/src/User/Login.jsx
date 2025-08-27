@@ -1,6 +1,7 @@
 import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import config from '../config/appConfig';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import backgroundImage from "../Assets/background.jpeg";
@@ -37,7 +38,7 @@ function Login() {
     e.preventDefault();
     try {
       const { data } = await axios.post(
-        "http://localhost:3002/login",
+  `${config.api_base_urls.user}/login`,
         {
           ...inputValue,
         },
@@ -84,7 +85,7 @@ function Login() {
         };
       }*/
       const { data } = await axios.post(
-        "http://localhost:3002/social-login",
+  `${config.api_base_urls.user}/social-login`,
         payload,
         { withCredentials: true }
       );
@@ -93,7 +94,7 @@ function Login() {
         handleSuccess(message);
         // Immediately fetch user info and set context
         const { data: verifyData } = await axios.post(
-          "http://localhost:3002/verify-cookie",
+          `${config.api_base_urls.user}/verify-cookie`,
           {},
           { withCredentials: true }
         );
