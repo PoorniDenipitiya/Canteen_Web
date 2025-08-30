@@ -3,7 +3,7 @@ const router = express.Router();
 const crypto = require('crypto');
 
 // Use your merchant secret here (never expose to frontend)
-const merchant_secret = "MjkwNzExODQ2OTQyOTczNDMzOTI3MTg3MzQ1MDAxNjYzOTkzNjcw";
+const merchant_secret = process.env.PAYHERE_MERCHANT_SECRET;
 
 router.post('/hash', (req, res) => {
   const { merchant_id, order_id, amount, currency } = req.body;

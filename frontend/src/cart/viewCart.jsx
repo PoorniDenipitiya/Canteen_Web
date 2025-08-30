@@ -48,7 +48,7 @@ const ViewCart = () => {
   const handleOnlinePayment = async (cart, cartIndex) => {
     // Prepare data for hash
   const paymentData = {
-    merchant_id: "1230192", // Use your merchant_id
+    merchant_id: process.env.REACT_APP_PAYHERE_MERCHANT_ID,
     order_id: cart.orderId || cart.order_id || Math.random().toString(36).substr(2, 9),
     amount: cart.subtotal.toFixed(2),
     currency: "LKR",
@@ -67,7 +67,7 @@ const ViewCart = () => {
     const payment = {
       ...paymentData,
       sandbox: true,
-      merchant_id: "1230192",
+      merchant_id: process.env.REACT_APP_PAYHERE_MERCHANT_ID,
   return_url: `${window.location.origin}/return`,
   cancel_url: `${window.location.origin}/cancel`,
   notify_url: `${config.api_base_urls.admin}/api/payments/notify`,
