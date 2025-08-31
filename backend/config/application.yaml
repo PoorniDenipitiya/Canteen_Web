@@ -2,8 +2,8 @@ cors:
   origins:
     - "http://localhost:3000"
     - "http://localhost:3001"
-    - "https://canteenz.vercel.app"
-    - "https://admin-canteenz.vercel.app"
+    - "https://canteen-web-mu.vercel.app"
+    - "https://canteen-admin-orcin.vercel.app"
 
 backend:
   port: 3002
