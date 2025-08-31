@@ -1,5 +1,5 @@
 const Complaint = require("../Models/ComplaintModel");
-const { supabase } = require("../supabaseconfig");
+const { supabase } = require("../supabaseConfig");
 
 async function submitComplaint(req, res) {
   try {
