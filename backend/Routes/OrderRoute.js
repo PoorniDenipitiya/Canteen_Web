@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Order = require("../Models/OrderModel");
 const Cart = require("../Models/CartModel");
+const { calculateUncollectedPenalty, updateUncollectedToFined } = require("../util/orderPenaltyCalculator");
 const jwt = require("jsonwebtoken");
 
 // Middleware to get userId from token
@@ -29,20 +30,39 @@ router.post("/api/orders", getUserIdFromToken, async (req, res) => {
       return res.status(409).json({ error: "Order with this ID already exists." });
     }
 
+    // Check for uncollected orders and calculate penalty
+    const penaltyInfo = await calculateUncollectedPenalty(req.userId, canteenName);
+    const totalPrice = price + penaltyInfo.penaltyAmount;
+
+    // Create the order with total price (including penalty)
     const order = await Order.create({
       userId: req.userId,
       orderId,
       canteenName,
-      price,
+      price: totalPrice, // Total price including penalty
+      originalPrice: price, // Store original order price
+      penaltyAmount: penaltyInfo.penaltyAmount, // Store penalty amount
       status: "order placed",
       paymentMode,
       items,
     });
 
-      // ✅ Delete the matching cart (safe cleanup)
+    // If payment is online, immediately update uncollected orders to fined
+    if (paymentMode === "online" && penaltyInfo.penaltyAmount > 0) {
+      await updateUncollectedToFined(req.userId, canteenName);
+    }
+
+    // ✅ Delete the matching cart (safe cleanup)
     await Cart.deleteOne({ orderId, userId: req.userId });
     
-    res.status(201).json(order);
+    res.status(201).json({
+      ...order.toObject(),
+      penaltyInfo: {
+        hasUncollectedOrders: penaltyInfo.penaltyAmount > 0,
+        penaltyAmount: penaltyInfo.penaltyAmount,
+        totalUncollectedAmount: penaltyInfo.totalUncollectedAmount
+      }
+    });
   } catch (error) {
     console.error("Order creation error:", error); // Debug log
     res.status(500).json({ error: "Failed to create order", details: error.message });

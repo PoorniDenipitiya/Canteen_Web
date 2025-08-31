@@ -129,6 +129,8 @@ const TrackOrder = () => {
       processing: "#FFD700",
       "order ready": "#4CAF50",
       collected: "#2196F3",
+      uncollected: "#FF5722",
+      fined: "#9C27B0",
     };
     return (
       <span className="status-indicator">
@@ -140,7 +142,7 @@ const TrackOrder = () => {
 
   return (
     <div className="track-order-container">
-      <h2>Your Orders</h2>
+      <h2>Complaints</h2>
       {orders.length === 0 ? (
         <p>You have no orders.</p>
       ) : (

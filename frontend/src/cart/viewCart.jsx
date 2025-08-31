@@ -27,12 +27,55 @@ const ViewCart = () => {
   const [cartDetails, setCartDetails] = useState([]);
   const [expandedCart, setExpandedCart] = useState(null);
   const [showPayOnline, setShowPayOnline] = useState(false);
+  const [penaltyInfo, setPenaltyInfo] = useState({});
 
   const navigate = useNavigate();
 
   const [showPayment, setShowPayment] = useState(false);
 
-   // Load PayHere script
+  // Check for uncollected orders and calculate penalty
+  const checkUncollectedPenalty = async (canteenName) => {
+    try {
+      const response = await axios.get(`${config.api_base_urls.user}/api/orders`, { withCredentials: true });
+      const userOrders = response.data;
+      
+      // Find uncollected orders for this canteen with cash payment
+      const uncollectedOrders = userOrders.filter(order => 
+        order.canteenName === canteenName && 
+        order.status === "uncollected" && 
+        order.paymentMode === "cash"
+      );
+      
+      if (uncollectedOrders.length > 0) {
+        const totalUncollectedAmount = uncollectedOrders.reduce((sum, order) => sum + order.price, 0);
+        const penaltyAmount = totalUncollectedAmount * 0.5;
+        
+        setPenaltyInfo(prev => ({
+          ...prev,
+          [canteenName]: {
+            hasUncollectedOrders: true,
+            penaltyAmount,
+            totalUncollectedAmount,
+            uncollectedOrders
+          }
+        }));
+      } else {
+        setPenaltyInfo(prev => ({
+          ...prev,
+          [canteenName]: {
+            hasUncollectedOrders: false,
+            penaltyAmount: 0,
+            totalUncollectedAmount: 0,
+            uncollectedOrders: []
+          }
+        }));
+      }
+    } catch (error) {
+      console.error('Error checking uncollected penalty:', error);
+    }
+  };
+
+  // Load PayHere script
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://www.payhere.lk/lib/payhere.js';
@@ -44,15 +87,31 @@ const ViewCart = () => {
     };
   }, []);
 
+  // Check penalty for each cart when cart details change
+  useEffect(() => {
+    if (cartDetails.length > 0) {
+      cartDetails.forEach(cart => {
+        if (cart.canteenName) {
+          checkUncollectedPenalty(cart.canteenName);
+        }
+      });
+    }
+  }, [cartDetails]);
+
   //Payhere payment handler
   const handleOnlinePayment = async (cart, cartIndex) => {
     // Prepare data for hash
-  const paymentData = {
-    merchant_id: process.env.REACT_APP_PAYHERE_MERCHANT_ID,
-    order_id: cart.orderId || cart.order_id || Math.random().toString(36).substr(2, 9),
-    amount: cart.subtotal.toFixed(2),
-    currency: "LKR",
-  };
+    // Calculate total amount including penalty for this cart
+    const penalty = penaltyInfo[cart.canteenName];
+    const hasPenalty = penalty && penalty.hasUncollectedOrders;
+    const totalAmount = hasPenalty ? cart.subtotal + penalty.penaltyAmount : cart.subtotal;
+    
+    const paymentData = {
+      merchant_id: process.env.REACT_APP_PAYHERE_MERCHANT_ID,
+      order_id: cart.orderId || cart.order_id || Math.random().toString(36).substr(2, 9),
+      amount: totalAmount.toFixed(2),
+      currency: "LKR",
+    };
 
   // Get hash from backend
   let hash = "";
@@ -362,44 +421,85 @@ const handleCashPayment = async (cart) => {
       {/* Right side - Cart Total */}
       <div className="cart-summary">
         <h3>Cart Total</h3>
-        {cartDetails.map((cart, cartIndex) => (
-          <>
-            <div key={cartIndex} className="subtotal">
-              <span className="cart-no">
-                {" "}
-                <b>Cart {cartIndex + 1}:</b>
-              </span>
-              <span className="cart-total">Total: Rs.{cart.subtotal}.00</span>
-              {/*  <span>Subtotal:</span>
-          <span>Rs. {totalAmount.toLocaleString()}</span>  */}
-            </div>
-            {/* <button
-          className="checkout-btn-viewCart"
-          disabled={cartDetails.length === 0}
-        >
-          Proceed to Checkout
-        </button> */}
+        {cartDetails.map((cart, cartIndex) => {
+          const penalty = penaltyInfo[cart.canteenName];
+          const hasPenalty = penalty && penalty.hasUncollectedOrders;
+          
+          return (
+            <div key={cartIndex}>
+              <div className="subtotal">
+                <span className="cart-no">
+                  {" "}
+                  <b>Cart {cartIndex + 1}:</b>
+                </span>
+                <span className="cart-total">Total: Rs.{cart.subtotal}.00</span>
+              </div>
+              
+              {/* Show penalty information if there are uncollected orders */}
+              {hasPenalty && (
+                <div className="penalty-info" style={{ 
+                  backgroundColor: '#fff3cd', 
+                  border: '1px solid #ffeaa7', 
+                  borderRadius: '4px', 
+                  padding: '10px', 
+                  margin: '10px 0',
+                  fontSize: '14px'
+                }}>
+                  <div style={{ color: '#856404', fontWeight: 'bold', marginBottom: '5px' }}>
+                    ⚠️ Previous Uncollected Orders
+                  </div>
+                  <div style={{ color: '#856404', marginBottom: '5px' }}>
+                    Total Uncollected: Rs. {penalty.totalUncollectedAmount.toLocaleString()}
+                  </div>
+                  <div style={{ color: '#dc3545', fontWeight: 'bold' }}>
+                    Penalty (50%): Rs. {penalty.penaltyAmount.toLocaleString()}
+                  </div>
+                  <div style={{ color: '#856404', fontSize: '12px', marginTop: '5px' }}>
+                    This amount will be added to your new order
+                  </div>
+                </div>
+              )}
+              
+              {/* Show total with penalty */}
+              {hasPenalty && (
+                <div className="total-with-penalty" style={{ 
+                  backgroundColor: '#f8d7da', 
+                  border: '1px solid #f5c6cb', 
+                  borderRadius: '4px', 
+                  padding: '10px', 
+                  margin: '10px 0',
+                  textAlign: 'center'
+                }}>
+                  <div style={{ color: '#721c24', fontWeight: 'bold', fontSize: '16px' }}>
+                    Total to Pay: Rs. {(cart.subtotal + penalty.penaltyAmount).toLocaleString()}
+                  </div>
+                  <div style={{ color: '#721c24', fontSize: '12px' }}>
+                    (Order: Rs. {cart.subtotal.toLocaleString()} + Penalty: Rs. {penalty.penaltyAmount.toLocaleString()})
+                  </div>
+                </div>
+              )}
 
-            <div className="checkout-options">
-              <button
-                className="checkout-btn-viewCart online"
-                disabled={cartDetails.length === 0}
-                onClick={() => handleOnlinePayment(cart, cartIndex)}
-              >
-                Pay Online
-              </button>
-              <button
-                className="checkout-btn-viewCart cash"
-                disabled={cartDetails.length === 0}
-                onClick={() => handleCashPayment(cart)}
-              >
-                Pay by Cash
-              </button>
-            </div>
+              <div className="checkout-options">
+                <button
+                  className="checkout-btn-viewCart online"
+                  disabled={cartDetails.length === 0}
+                  onClick={() => handleOnlinePayment(cart, cartIndex)}
+                >
+                  Pay Online
+                </button>
+                <button
+                  className="checkout-btn-viewCart cash"
+                  disabled={cartDetails.length === 0}
+                  onClick={() => handleCashPayment(cart)}
+                >
+                  Pay by Cash
+                </button>
+              </div>
 
-            <hr></hr>
-          </>
-        ))}
+              <hr></hr>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
