@@ -49,6 +49,19 @@ function Login() {
       if (success) {
         console.log("Success message triggered");
         handleSuccess(message);
+        // Immediately fetch user info and set context
+        try {
+          const { data: verifyData } = await axios.post(
+            `${config.api_base_urls.user}/verify-cookie`,
+            {},
+            { withCredentials: true }
+          );
+          if (verifyData.status) {
+            login(verifyData.user);
+          }
+        } catch (error) {
+          console.log("Error verifying cookie:", error);
+        }
         setTimeout(() => {
           navigate("/");
         }, 1000);
