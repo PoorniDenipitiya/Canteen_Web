@@ -7,7 +7,7 @@ require("dotenv").config();
 
 const authRoute = require("./Routes/AuthRoute");
 const cartRoute = require("./Routes/CartRoute");
-const { MONGO_URL, PORT } = process.env;
+const { MONGO_URL } = process.env;
 
 
 
@@ -47,6 +47,8 @@ app.use('/api/complaints', complaintRoute);
 
 const favoriteRoute = require('./Routes/FavoriteRoute');
 app.use('/api/favorites', favoriteRoute);
+
+const PORT = process.env.PORT || 3002;
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
