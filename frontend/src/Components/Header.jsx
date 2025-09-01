@@ -146,7 +146,6 @@ const Header = () => {
             <div className="user-menu__dropdown">
               <span>Welcome {user || "Guest"}!</span>
               <hr></hr>
-              <Link to="/profile">Profile</Link>
               <Link to="/myorder">My Orders</Link>
               <button onClick={handleLogout}>Logout</button>
             </div>
